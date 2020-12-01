@@ -28,10 +28,19 @@
 	    accessToken: 'pk.eyJ1Ijoic2NvdHRvd2FkZXMiLCJhIjoiY2tpNmc1ZTYwMmhqbzJ4bzNoMTdyOWIydSJ9.OKWMQ73E1BQVz7SKI2gGKA'
 		}).addTo(mymap);
 
+	function onEachFeature(feature, layer) {
+	    if (feature.properties && feature.properties.SitusAddress) {
+	        layer.bindPopup('Address: ' +feature.properties.SitusAddress );
+	    }
+}
+
   // load GeoJSON from an external file
   $.getJSON("parcels_small.geojson",function(data){
     // add GeoJSON layer to the map once the file is loaded
     L.geoJson(data).addTo(mymap);
+    L.geoJSON(data, { onEachFeature: onEachFeature }).addTo(mymap);
   });
+
+
 </script>
 </body>
