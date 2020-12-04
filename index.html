@@ -13,11 +13,25 @@
 
 <body>
 
-<div id="mapid" style="height: 1000px; width: 1000px"></div>
+<form>
+  <label for="cars">Choose a property owner:</label>
+  <select name="owners" id="owners">
+    <option value="250 FRANK H OGAWA PLZ 4 OAKLAND CA 94612">City of Oakland</option>
+    <option value="3300 POWELL ST 101 EMERYVILLE CA 94608">Emery Cove Yacht Harbor</option>
+    <option value="1333 PARK AVE EMERYVILLE CA 94608">City of Emeryville</option>
+    <option value="PO BOX 24483 OAKLAND CA 94623">SMC Rents/Sullivan Management</option>
+  </select>
+  <br><br>
+  <input type="button" value="Enter" onclick="displayParcels()">
+</form>
+
+<p>Select a property owner to see all of the properties they own.</p>
+
+<div id="mapid" style="height: 500px; width: 1000px"></div>
 <script type="text/javascript">
 
 // Not proud of including my mapbox token in public code, but it is pretty restricted and I haven't figured out best practices with .env etc in javascript
-	var mymap = L.map('mapid').setView([37.84, -122.28], 15);
+	var map = L.map('mapid').setView([37.84, -122.28], 15);
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic2NvdHRvd2FkZXMiLCJhIjoiY2tpNmc1ZTYwMmhqbzJ4bzNoMTdyOWIydSJ9.OKWMQ73E1BQVz7SKI2gGKA',
 		{
 	    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -26,21 +40,30 @@
 	    tileSize: 512,
 	    zoomOffset: -1,
 	    accessToken: 'pk.eyJ1Ijoic2NvdHRvd2FkZXMiLCJhIjoiY2tpNmc1ZTYwMmhqbzJ4bzNoMTdyOWIydSJ9.OKWMQ73E1BQVz7SKI2gGKA'
-		}).addTo(mymap);
+		}).addTo(map);
 
+	// Create group for your layers and add it to the map
+	var featureGroup = L.featureGroup().addTo(map);
 	function onEachFeature(feature, layer) {
 	    if (feature.properties && feature.properties.SitusAddress) {
 	        layer.bindPopup('Address: ' +feature.properties.SitusAddress );
 	    }
-}
+	}
+	function displayParcels() {
+		featureGroup.clearLayers();
+		ownerSelection = document.getElementById('owners').value
+		function ownerFilter(feature) {
+			  if (feature.properties.MailingAddress === ownerSelection) return true
+			}		
+	  	// load GeoJSON from an external file
+		$.getJSON("parcels_94608.geojson",function(data){
+	    // add GeoJSON layer to the map
+	    	L.geoJSON(data, { onEachFeature: onEachFeature, filter: ownerFilter }).addTo(featureGroup);
+		  })
+		console.log(featureGroup)
+		// map.fitBounds(featureGroup.getBounds())
 
-  // load GeoJSON from an external file
-  $.getJSON("parcels_small.geojson",function(data){
-    // add GeoJSON layer to the map once the file is loaded
-    L.geoJson(data).addTo(mymap);
-    L.geoJSON(data, { onEachFeature: onEachFeature }).addTo(mymap);
-  });
-
+	}
 
 </script>
 </body>
