@@ -9,29 +9,51 @@
 	   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
 	   crossorigin=""></script>
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            border: 2px black solid;
+            font: 12px sans-serif;
+        }
+
+        td {
+            border: 1px black solid;
+            padding: 5px;
+        }
+    </style>
 </head>
 
 <body>
+   <!-- Table to hold the Divs -->
+   <table border="0" cellpadding="10" style="overflow-y: scroll;">
+        <tr>
+            <td><div id="table_container" class="csvTable"></div></td>
+            <td><div id="map_container" style="height: 800px; width: 800px"></div></td>
+        </tr>
+    </table>
 
-<form>
-  <label for="cars">Choose a property owner:</label>
-  <select name="owners" id="owners">
-    <option value="250 FRANK H OGAWA PLZ 4 OAKLAND CA 94612">City of Oakland</option>
-    <option value="3300 POWELL ST 101 EMERYVILLE CA 94608">Emery Cove Yacht Harbor</option>
-    <option value="1333 PARK AVE EMERYVILLE CA 94608">City of Emeryville</option>
-    <option value="PO BOX 24483 OAKLAND CA 94623">SMC Rents/Sullivan Management</option>
-  </select>
-  <br><br>
-  <input type="button" value="Enter" onclick="displayParcels()">
-</form>
-
-<p>Select a property owner to see all of the properties they own.</p>
-
-<div id="mapid" style="height: 500px; width: 1000px"></div>
 <script type="text/javascript">
+ 
+ 
+ d3.text("landlords.csv", function(data) {	
+                var parsedCSV = d3.csv.parseRows(data);
+
+                var container = d3.select("#table_container")
+                    .append("table")
+
+                    .selectAll("tr")
+                        .data(parsedCSV).enter()
+                        .append("tr")
+
+                    .selectAll("td")
+                        .data(function(d) { return d; }).enter()
+                        .append("td")
+                        .text(function(d) { return d; }).on("click", function(d) { displayParcels(d) })
+            });
 
 // Not proud of including my mapbox token in public code, but it is pretty restricted and I haven't figured out best practices with .env etc in javascript
-	var map = L.map('mapid').setView([37.84, -122.28], 15)
+	var map = L.map('map_container').setView([37.84, -122.28], 15)
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic2NvdHRvd2FkZXMiLCJhIjoiY2tpNmc1ZTYwMmhqbzJ4bzNoMTdyOWIydSJ9.OKWMQ73E1BQVz7SKI2gGKA',
 		{
 	    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -49,11 +71,10 @@
 	        layer.bindPopup('Address: ' +feature.properties.SitusAddress )
 	    }
 	}
-	function displayParcels() {
+	function displayParcels(string) {
 		featureGroup.clearLayers()
-		ownerSelection = document.getElementById('owners').value
 		function ownerFilter(feature) {
-			  if (feature.properties.MailingAddress === ownerSelection) return true
+			  if (feature.properties.MailingAddress === string) return true
 			}		
 	  	// load GeoJSON from an external file
 		$.getJSON("parcels_94608.geojson",function(data){
