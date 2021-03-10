@@ -16,27 +16,51 @@
             border: 2px black solid;
             font: 12px sans-serif;
         }
-
         td {
             border: 1px black solid;
             padding: 5px;
         }
+		#table-wrapper {
+		  position:relative;
+		}
+		#table-scroll {
+		  height:200px;
+		  overflow:auto;  
+		  margin-top:20px;
+		}
+		#table-wrapper table {
+		  width:auto;
+
+		}
+		/*#table-wrapper table thead th .text {
+		  position:absolute;   
+		  top:-20px;
+		  z-index:2;
+		  height:20px;
+		  width:35%;
+		  border:1px solid red;
+		}*/
+
     </style>
 </head>
 
 <body>
+   <h1> Who owns the most property in 94608?</h1>
+   Click a property owner to see their properties! This tool estimates property ownership by looking at the mailing address listed for a given parcel. The true ownership isn't available online, so this is my best estimate.
    <!-- Table to hold the Divs -->
-   <table border="0" cellpadding="10" style="overflow-y: scroll;">
-        <tr>
-            <td><div id="table_container" class="csvTable"></div></td>
-            <td><div id="map_container" style="height: 800px; width: 800px"></div></td>
-        </tr>
-    </table>
+    <div id="table-wrapper">
+	   <div id="table-scroll">
+	   		<table border="0" cellpadding="10" style="overflow-y: scroll;">
+			        <tr>
+			            <td><div id="table_container" class="csvTable"></div></td>
+			        </tr>
+		    </table>
+		</div>
+	 </div>
+	 <div id="map_container" style="height: 800px; width: 800px"></div>
 
 <script type="text/javascript">
- 
- 
- d3.text("landlords.csv", function(data) {	
+ d3.text("landlords_94608.csv", function(data) {	
                 var parsedCSV = d3.csv.parseRows(data);
 
                 var container = d3.select("#table_container")
@@ -69,6 +93,7 @@
 	function onEachFeature(feature, layer) {
 	    if (feature.properties && feature.properties.SitusAddress) {
 	        layer.bindPopup('Address: ' +feature.properties.SitusAddress )
+	        // add a list of owners for each address (to not imply that one owner has a whole building)
 	    }
 	}
 	function displayParcels(string) {
@@ -85,4 +110,7 @@
 	}
 
 </script>
+
+Built by Scott Owades <a href="https://github.com/owades/parcel-mapping"> (source) </a> </br>
+<a href="https://data.acgov.org/datasets/b55c25ae04fc47fc9c188dbbfcd51192_0?showData=true"> Data from Alameda County </a>
 </body>
