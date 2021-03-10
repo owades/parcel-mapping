@@ -57,6 +57,7 @@
 		    </table>
 		</div>
 	 </div>
+	 <br>
 	 <div id="map_container" style="height: 800px; width: 800px"></div>
 
 <script type="text/javascript">
@@ -92,7 +93,8 @@
 	var featureGroup = L.featureGroup().addTo(map)
 	function onEachFeature(feature, layer) {
 	    if (feature.properties && feature.properties.SitusAddress) {
-	        layer.bindPopup('Address: ' +feature.properties.SitusAddress )
+	        layer.bindPopup('Address: ' + feature.properties.SitusAddress + '</br>' +
+	        				 'Owner Address: ' + feature.properties.MailingAddress)
 	        // add a list of owners for each address (to not imply that one owner has a whole building)
 	    }
 	}
