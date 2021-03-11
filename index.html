@@ -94,7 +94,9 @@
 	function onEachFeature(feature, layer) {
 	    if (feature.properties && feature.properties.SitusAddress) {
 	        layer.bindPopup('Address: ' + feature.properties.SitusAddress + '</br>' +
-	        				 'Owner Address: ' + feature.properties.MailingAddress)
+	        				 'Owner Address: ' + feature.properties.MailingAddress + '</br>' +
+	        				 'Owner Name (approximated): ' + feature.properties.Owner
+	        				 )
 	        // add a list of owners for each address (to not imply that one owner has a whole building)
 	    }
 	}
